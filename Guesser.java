@@ -2,17 +2,20 @@ import java.io.Console;
 import java.util.Scanner;
 
 public class Guesser {
-  private int low;
-  private int high;
-  public Guesser(int low, int high) {
+    private int low;
+    private int high;
+
+    public Guesser(int low, int high) {
         this.low = low;
         this.high = high;
-  }
-  public void start() {
+    }
+
+    public void start() {
         rules();
         doGuesses();
-  }
- private void rules() {
+    }
+
+    private void rules() {
         System.out.println("Think of a number between " +
                 low + " and " + high);
         System.out.println("I'm going to ask a few questions in order " +
@@ -20,11 +23,11 @@ public class Guesser {
         System.out.println("Please answer T for true, and F for false.\n");
     }
 
-  private String getReply() {
+    private String getReply() {
         Console console = System.console();
         if (console == null) {
-            Scanner scanner = new Scanner(System.in);
-            String reply = null;
+            Scanner scanner = new java.util.Scanner(System.in);
+            String reply;
             while (true) {
                 System.out.print("Your answer (T/F): ");
                 reply = scanner.nextLine().trim().toUpperCase();
@@ -47,7 +50,8 @@ public class Guesser {
             }
         }
     }
-  private void doGuesses() {
+
+    private void doGuesses() {
         int i = 0;
         int middle = 0;
         while (low < high) {
@@ -65,11 +69,11 @@ public class Guesser {
         }
         answer(low, i);
     }
- private void answer(int guess, int numberOfGuesses){
-    System.out.println("You were thinking about " +
-                       guess +
-                       " (took me " + numberOfGuesses +
-                       " guesses)");
-  }
 
- }
+    private void answer(int guess, int numberOfGuesses) {
+        System.out.println("You were thinking about " +
+                guess +
+                " (took me " + numberOfGuesses +
+                " guesses)");
+    }
+}
