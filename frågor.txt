@@ -1,0 +1,32 @@
+1. Vad är pull respektive push?
+Push menar att man trycker upp alla ändringar som har kommitat från
+lokala repo till fjärrrepo.
+Pull menar att man drar ner ändringar från fjärrrepo till lokal repo vad
+som har kopplat med fjärrropo redan.
+
+2. När använder man log respektive status?
+Git log används när man vill se kommit-historiken för varje repository,
+inklusive detaljer som författare, tid, meddelande och ID för varje kommit.
+Syftet är att spåra utvecklingsprocessen, ändringar i repositoryet
+och även att ändra kommits som kommittats tidigare genom ID kommmit.
+
+Man använder kommandot git status för att kontrollera den aktuella statusen
+för filer i ett Git-repo. Det här kommandot kan visa vad som har ändrats
+och vad som har lagts till (add) i Staging Area.
+Syftet med att använda git status är att veta vad man har gjort och
+vad man ska göra nästa (add eller commit).
+
+3.Vad är en Git branch och varför är de viktiga?
+En git branch är en kopia av källkoden (vanligtvis master eller main)
+i det ögonblicket när den skapas. Denna branch kan dock ändras,
+utvecklas, testas, åtgärdas oberoende av varandra... utan att påverka
+källkoden förrän den har merge.
+
+Att använda git-branch är verkligen viktigt när det är många personer
+som arbetar på samma projekt.
+Varje person i teamet kan arbeta på en annan branch utan att påverka main.
+Och sedan använda git merge för att slutföra projektet.
+
+4.Det finns flera sätt att rulla tillbaka koden till ett tidigare tillstånd.
+4-1: git reset: Git reset används för att flytta HEAD (pekaren till den aktuella commiten)
+ så att den pekar på en specifik commit. Det finns tre typer av "git reset".
