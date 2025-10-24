@@ -28,5 +28,107 @@ Varje person i teamet kan arbeta på en annan branch utan att påverka main.
 Och sedan använda git merge för att slutföra projektet.
 
 4.Det finns flera sätt att rulla tillbaka koden till ett tidigare tillstånd.
+
+Jag skapade en feature branch, där skapade jag en text.txt fil.
+Skrev in rad1, rad 2, rad3 och rad4 med fyra gånger add och commit.
+Nu har jag git log --oneline -4 som:
+
+ae839e6 (HEAD -> feature) Adding text line 4 in the file text.txt
+a3eb1c9 Adding text in the file text.txt
+239f26e Adding one line in the file text.txt
+7dfebbb Creating a file text.txt
+
 4-1: git reset: Git reset används för att flytta HEAD (pekaren till den aktuella commiten)
- så att den pekar på en specifik commit. Det finns tre typer av "git reset".
+ så att den pekar på en specifik commit och kan påverka commit-historiken.
+Det finns tre typer av "git reset".
+
+git reset --hard: den kommandon använder man när man vill backa commits lokalt
+och ta bort ändring även i staging area och arbetskatalog.
+Den kommandon kan ta bort alla ändringar permanent.
+
+Tx: Jag använder git reset --hard a3eb1c9 så kommer 
+Output: HEAD is now at a3eb1c9 Adding text in the file text.txt.
+git log --oneline -4
+a3eb1c9 (HEAD -> feature) Adding text in the file text.txt
+239f26e Adding one line in the file text.txt
+7dfebbb Creating a file text.txt
+d8a00b8 creating a file test.txt
+
+Den kommandon tog bort sista commit, borta också rad 4 som jag har lagt i filen text.txt.
+
+git reset --mixed eller git reset: den kommandon brukar används när
+man lägger till något felaktigt till staging area för att den
+flyttar HEAD till den gamla commit-filen, tar bort filer
+från staging-området, men lämnar fil innehållet i arbetskatalogen orört. 
+
+Tx: git reset HEAD~1
+Output: Unstaged changes after reset:
+M       text.txt
+
+git status: On branch feature
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   text.txt
+
+git log --oneline -4
+239f26e (HEAD -> feature) Adding one line in the file text.txt
+7dfebbb Creating a file text.txt
+d8a00b8 creating a file test.txt
+783dab7 (origin/main) Format all lines in the file Guesser.java
+
+Den backa 1 commit, tog bort senaste ändringar av filen från staging area,
+behålla bara innehållet av filen som har ändrat i arbetskatalogen.
+
+git reset --soft: använder man när man vill bara ändra commits messages
+för att den bara flyttar HEAD till en tidigare commit men behåller alla ändringar
+i filer från staging-området och lämnar fil innehållet i arbetskatalogen orört.
+
+Tx: git reset --soft HEAD~1
+
+git status: On branch feature
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        deleted:    test.txt
+        modified:   text.txt
+
+git log --oneline -4
+7dfebbb (HEAD -> feature) Creating a file text.txt
+d8a00b8 creating a file test.txt
+783dab7 (origin/main) Format all lines in the file Guesser.java
+910e9fc Complete the Guesser program.
+
+Vi kan se den kommandon tog bort bara senaste commit, ändringar i staging area
+och working directory hehållas.
+
+4.2 git revert: används för att skapar en ny commit som kopia commit,
+ändringar som man har pekat och lägga den ny commit till HEAD.
+Den ändrar inte commits historikens. 
+
+Tx: nu har jag  git log --oneline -4
+c6d356a (HEAD -> feature) Adding line 4 in the text.txt
+e57175a Adding line 3 in the text.txt
+703448f Adding line 2 in the text.txt
+86b055d Creating a file text.txt
+
+git revert HEAD~3
+Output:
+Auto-merging text.txt
+CONFLICT (content): Merge conflict in text.txt
+error: could not revert 86b055d... Creating a file text.txt
+This reverts commit 86b055dd75bbb24b5fd753e30a756280fe8dbd1b.
+
+efter resolv conflict, jag har git log --oneline -4
+7a111bb (HEAD -> feature) Revert "Creating a file text.txt"
+c6d356a Adding line 4 in the text.txt
+e57175a Adding line 3 in the text.txt
+703448f Adding line 2 in the text.txt
+
+HEAD nu är en ny commit men inverterar commit i HEAD~3 "Creating a file text.txt"
+Så den kommandon skapar en ny commit som "återställer" ändringarna
+i den angivna commiten. Historiken har inte ändras.
+
+4.3 git restore: Man använder git restore när man vill återställa filer
+i arbetskatalogen som inte har git add än, förstöra filer som har
+git add (tagits bort från staging-området) och återställa filer från
+en specifik commit (git restore --source).
