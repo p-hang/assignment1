@@ -209,3 +209,157 @@ no changes added to commit (use "git add" and/or "git commit -a")
 
 Den är exakt samma commit historiken ovanför. Den kommit påverka bara
 till filen i working directory och staging area utan commit historiken.
+
+VG fråga:
+
+git merge: skapar en merge commit som binder ihop historiken från två branches. 
+Bevarar exakt hur arbetet faktiskt gick till.
+Fördelar: eftersom det inte ändrar befintliga commits på andra branch, vilket
+undviker förvirring, enkelt att spåra projekthistorik då bli den säker vid delad branch.
+Läsbar commit-historik: Commit-historiken visar tydligt vid vilken tidpunkt 
+sammanslagningen inträffade.
+Lätt att jobba i teamet: Det här kommandot gör det möjligt för teammedlemmar att 
+arbeta parallellt på separata branch och sedan sammanfoga sitt arbete säkert och enkelt.
+
+Nackdelar: Kan leda till "brusig" historik med många merge-commits.
+Mindre "ren" linjär historik — svårare att följa en strikt tidlinje av förändringar.
+Tx: 
+Jag ändrar file main.txt på båda branch main och feature, kör git commit -am "". 
+Sent kommer jag till baka till main branch och kör 
+git merge feature
+Auto-merging file.txt
+CONFLICT (content): Merge conflict in file.txt
+Auto-merging main.txt
+CONFLICT (content): Merge conflict in main.txt
+Automatic merge failed; fix conflicts and then commit the result.
+git log innan merge:
+git log --oneline -3
+2aa0e80 (HEAD -> main) Adding line 3 from main
+1e21de9 fix conflicts
+3b70872 (feature) Adding line 2 file main.txt from feature branch
+aa5b09b Adding line 2 file main.txt från main
+
+git log --oneline -3
+64fa52d (HEAD -> feature) Adding line 3 from feature
+3b70872 Adding line 2 file main.txt from feature branch
+1919109 changes file text in feature branch
+
+Merge conflict
+cat main.txt
+Hi
+Hello
+<<<<<<< HEAD
+Hello
+=======
+Hello again
+>>>>>>> feature
+ 
+Jag fix conflicts, behåller båda 2 version sent kör jag git commit.
+
+git log efter merge, ändrar inte historiken som reda commit.
+git log --oneline -3
+341b9be (HEAD -> main) fix merge conflict
+64fa52d (feature) Adding line 3 from feature
+2aa0e80 Adding line 3 from main
+
+hang@Hang-Phan:~/git_rebase$ cat main.txt
+
+Hi
+Hello
+Hello
+Hello again
+hang@Hang-Phan:~/git_rebase$ git switch feature
+Switched to branch 'feature'
+hang@Hang-Phan:~/git_rebase$ cat main.txt
+
+Hi
+Hello
+Hello again
+Så kommer merge efter har fixat conflict.
+
+
+git rebase: flyttar (återspelar) dina commits ovanpå en annan bascommit så att 
+historiken blir linjär — det ser ut som om du byggt direkt på den senaste basen.
+Fördelar: Ren, linjär historik — enklare att följa commit för commit.
+Kan förstå förändringar lättare eftersom det inte finns många merge-commits.
+Användbart för att rensa upp commits lokalt.
+Nackdelar: Omskriver historik — farligt om du rebase commits som redan är pushade 
+och andra arbetar på dem. Ledar till svårt att jobba i teamet.
+Kräver ofta git push --force-with-lease när du pushar rebasade commits (kan 
+överrida andras arbete om du inte är försiktig).
+Visa inte riktig commit historiken då svårt att fölier projektets framsteg.
+
+Tx:
+
+Jag ändrar file main.txt på båda branch main och feature, kör git commit -am "". 
+Sent kommer jag till baka till feature branch och kör:
+ git rebase main
+Auto-merging main.txt
+CONFLICT (content): Merge conflict in main.txt
+error: could not apply 838fabc... Adding text from branch feature
+Could not apply 838fabc... # Adding text from branch feature
+git log innan fix conflict
+git log --oneline -7 
+532695b (HEAD -> feature) line 5 from feature
+838fabc Adding text from branch feature
+95dcabe (main) Adding text from branch main
+bc3c0c2 fix the conflict
+fa68ef3 Adding text from feature branch
+543363e Adding text from main branch
+b65c34b Merge branch 'feature'
+
+git log --oneline -7
+0883c9c (HEAD -> main) line 5 from main
+95dcabe Adding text from branch main
+bc3c0c2 fix the conflict
+fa68ef3 Adding text from feature branch
+543363e Adding text from main branch
+b65c34b Merge branch 'feature'
+ae61e2e Adding text from feature
+
+cat main.txt
+
+Hi
+Hello
+Hello
+Hello again
+line 4 from main
+<<<<<<< HEAD
+Hoh
+=======
+line 4 from feature
+>>>>>>> 838fabc (Adding text from branch feature)
+
+Jag fix conflict, behåller två ändringar versioner. Sent kör jag git add . och continue rebase.
+git add .
+git rebase --continue
+[detached HEAD df07042] Adding text from branch feature
+ 1 file changed, 1 insertion(+)
+Successfully rebased and updated refs/heads/feature.
+
+git log --oneline -7
+b3cf8ce (HEAD -> feature) line 5 from feature
+df07042 Adding text from branch feature
+0883c9c (main) line 5 from main
+95dcabe Adding text from branch main
+bc3c0c2 fix the conflict
+fa68ef3 Adding text from feature branch
+543363e Adding text from main branch
+
+Den git rebase ändrar även commit historiken. Den sista commit har samma mesage men commit hash har bytt (532695b --> b3cf8ce)
+
+git merge behöver man inte merge igen efter fixat conflict men git rebase måste man kör rabase continue. 
+
+När man använder git rebase kommer commit historiken se fint ut för att ha en 
+linjär historik. Inga fler merge-commits. Det går inte att se i loggen vilka commits som kommer från vilken funktionsgren. Varje commit ser ut som om den gjordes i följd på main. Lämplig när du vill ha ren, prydlig och lättläst historia. 
+Bra att använda när man arbetar ensam på en personlig gren finns det inget behov 
+av att hålla ett branch track.
+
+När man jobba tillsamman i en grupp då använder man git merge för se projektets 
+verkliga historia: vem gjorde vad, på vilken branch, när den merge.
+Samband mellan commits: vilken commit kom från vilken branch, varför två branches 
+merge, när den merge.
+Faktisk arbetsordning, inte bara det slutliga resultatet. Git merge är säkrare 
+eftersom det inte ändrar den gamla commit-hashen. Undviker onödiga konflikter och 
+bevarar allas arbete.
+
