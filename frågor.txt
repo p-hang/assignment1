@@ -132,3 +132,80 @@ i den angivna commiten. Historiken har inte ändras.
 i arbetskatalogen som inte har git add än, förstöra filer som har
 git add (tagits bort från staging-området) och återställa filer från
 en specifik commit (git restore --source).
+TX: Nu har jag filen text.txt som den:
+cat text.txt
+"Hi
+
+line 2
+line 3
+line 4
+Hello
+Hi again
+Hi tripple
+line 4
+line 5"
+
+Jag vill lägga en rad till med text "Hello", men gjorde jag fel
+med kommandon cat > Hello sent, kör jag git add .
+git status har jag nu
+On branch feature
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        modified:   text.txt 
+
+Nu vill jag ångra den, jag vill inte commit den ändringen, då kör jag
+git restore --staged text.txt.
+git status
+On branch feature
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   text.txt
+Då ändringen i staging area borta men filen i working directory fortfarande
+innehålla bara "Hello". Nu vill jag backa den senaste ändringen. Kör jag git restore text.txt.
+cat text.txt
+"Hi
+
+line 2
+line 3
+line 4
+Hello
+Hi again
+Hi tripple
+line 4
+line 5"
+
+git store --staged text.txt backa sista ändring i staging area en steg och
+git store text.txt backa sista ändringen i working directory.
+
+git restore --source=<commit-hash> <file> eller git restore --source=HEAD~ <file>
+Används för att återställa fil innehållet vid en pekad commit dock ändra inte history. 
+TX: Filen text.txt är exakt samma innehållen med filen ovan. 
+git log --oneline -4
+7a111bb (HEAD -> feature) Revert "Creating a file text.txt"
+c6d356a Adding line 4 in the text.txt
+e57175a Adding line 3 in the text.txt
+703448f Adding line 2 in the text.txt
+git restore --source=HEAD~3 text.txt
+ cat text.txt
+"Hi
+
+line 2"
+
+Den text.txt är filen i commit "703448f Adding line 2 in the text.txt"
+men har jag git log --oneline -4
+7a111bb (HEAD -> feature) Revert "Creating a file text.txt"
+c6d356a Adding line 4 in the text.txt
+e57175a Adding line 3 in the text.txt
+703448f Adding line 2 in the text.txt
+git status
+On branch feature
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   text.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+Den är exakt samma commit historiken ovanför. Den kommit påverka bara
+till filen i working directory och staging area utan commit historiken.
